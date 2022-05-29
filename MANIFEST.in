@@ -1,0 +1,2 @@
+include examples/data/*
+include speechmetrics/absolute/mosnet/*.h5
