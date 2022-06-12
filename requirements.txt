@@ -1,0 +1,10 @@
+numpy~=1.19.5
+flask~=2.1.2
+werkzeug~=2.0.3
+scipy~=1.7.3
+flask_cors~=3.0.10
+tensorflow~=2.3.0
+setuptools~=61.2.0
+srmrpy~=1.0
+gammatone~=1.0
+librosa~=0.9.1
