@@ -19,9 +19,9 @@ from scipy import ndimage
 #from scipy.misc import imsave
 from flask_cors import *  # 注意这一行-01
 
+from algorithm.speechAssessment import single_speech_assessment
 
-
-UPLOAD_FOLDER = 'uploads'
+UPLOAD_FOLDER = 'audioFile'
 ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg'}
 from tensorflow.python.platform import gfile
 app = Flask(__name__, static_folder="static",template_folder="templates",static_url_path="/")
@@ -40,20 +40,27 @@ CORS(app, supports_credentials=True)  # 注意这一行-02
 
 #==============================================================================================================================
 #                                                                                                                              
-#  This function is used to do the image search/image retrieval
+#  This function is used to do speech assessment scoring
 #                                                                                                                              
 #==============================================================================================================================
-@app.route('/', methods=['GET', 'POST'])
+@app.route('/audioQuality', methods=['POST'])
 @cross_origin(supports_credentials=True)
-def upload_img():
-    print("image upload")
-    result = 'static/result'
-    if not gfile.Exists(result):
-          os.mkdir(result)
-    shutil.rmtree(result)
-    if request.method == 'POST' or request.method == 'GET':
-        return False
-
+def get_audio_quality():
+    # 获取通过url请求传参的数据
+    # 算法
+    algorithms = request.form.to_dict()
+    audio_file = request.files.to_dict()
+    audio = audio_file['audioFile']
+    result = {}
+    if audio:  # and allowed_file(file.filename):
+        filename = secure_filename(audio.filename)
+        filename += '.wav'
+        audio.save('../algorithm/'+filename)
+        inputloc = '../algorithm/'+filename
+        for algorithm in algorithms.get('algorithms').split(','):
+            result[algorithm] = single_speech_assessment(inputloc,algorithm)[algorithm].tolist()
+        print(result)
+    return jsonify(result)
 #==============================================================================================================================
 #                                                                                                                              
 #                                           Main function                                                        	            #						     									       
