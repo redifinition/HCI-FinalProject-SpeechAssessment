@@ -2,7 +2,7 @@ import speechmetrics as sm
 import pprint
 from audoai.noise_removal import NoiseRemovalClient
 noise_removal = NoiseRemovalClient(api_key='c70f68814902e8705aa9d16ac84e91bf')
-window = 15
+window = 2
 
 ALGORITHM_INFO = {"mosnet":"absolute",
                   "srmr":"absolute",
@@ -61,6 +61,6 @@ def speech_assessment_all(wav_url):
 
 # single_speech_assessment('test.wav',  'mosnet')
 # single_speech_assessment('data/m2_script1_clean.wav', 'mosnet')
-# single_speech_assessment('data/m2_script1_produced.wav', 'mosnet')
+# single_speech_assessment('../algorithm/test.wav', 'bsseval')
 #
 # speech_assessment_all('data/m2_script1_ipad_confroom1.wav')

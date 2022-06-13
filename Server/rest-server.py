@@ -46,6 +46,7 @@ CORS(app, supports_credentials=True)  # 注意这一行-02
 @app.route('/audioQuality', methods=['POST'])
 @cross_origin(supports_credentials=True)
 def get_audio_quality():
+    import time
     # 获取通过url请求传参的数据
     # 算法
     algorithms = request.form.to_dict()
@@ -58,9 +59,40 @@ def get_audio_quality():
         audio.save('../algorithm/'+filename)
         inputloc = '../algorithm/'+filename
         for algorithm in algorithms.get('algorithms').split(','):
-            result[algorithm] = single_speech_assessment(inputloc,algorithm)[algorithm].tolist()
+            info= {}
+            # 计算运行时间
+            time_before = time.process_time()
+            print(algorithm)
+            if algorithm == "bsseval":
+                score_list = single_speech_assessment(inputloc,algorithm)
+                score_list['isr'] = score_list['isr'].tolist()[0]
+                score_list['sar'] = score_list['sar'].tolist()[0]
+                score_list['sdr'] = score_list['sdr'].tolist()[0]
+            else:
+                score_list = single_speech_assessment(inputloc,algorithm)[algorithm].tolist()
+            time_after = time.process_time()
+            time_num = float(time_after - time_before) * 1000
+            info["score"] = score_list
+            avg_score = 0
+            if not algorithm == "bsseval":
+                avg_score = get_avg(score_list)
+            else:
+                avgscore = {}
+                avgscore['isr'] = get_avg(score_list['isr'])
+                avgscore['sar'] = get_avg(score_list['sar'])
+                avgscore['sdr']  = get_avg(score_list['sdr'])
+            info["time"] = time_num
+            info["avgScore"] = avg_score
+            result[algorithm] = info
         print(result)
     return jsonify(result)
+
+
+def get_avg(score_list):
+    sum = 0
+    for item in score_list:
+        sum += item
+    return sum/len(score_list)
 #==============================================================================================================================
 #                                                                                                                              
 #                                           Main function                                                        	            #						     									       
